@@ -65,7 +65,7 @@ public class ShipSoundController : MonoBehaviour
 			{
 				int normalizedNote = midiNote - 50;
 				normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
-				cachedTargetRotation.eulerAngles = new Vector3(0, normalizedNote * 22.5f, 0);
+				cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * 22.5f);
 				// transform.rotation = rot;
 
 				Debug.Log("Detected note: " + midiNote);	
@@ -79,7 +79,7 @@ public class ShipSoundController : MonoBehaviour
 		transform.rotation = Quaternion.Slerp(transform.rotation, cachedTargetRotation, 0.05f);
 
 		transform.position = transform.position + 
-			transform.forward * SPEED * Time.deltaTime;
+			transform.up * SPEED * Time.deltaTime;
 
 		accumTime += Time.deltaTime;
 	}
