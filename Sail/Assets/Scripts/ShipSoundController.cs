@@ -17,6 +17,10 @@ public class ShipSoundController : MonoBehaviour
 		FREQUENCY_LINEAR,
 		OCTAVE_TURN_AROUND
 	}
+
+	public delegate void CoinChangeCallback(int coin);
+	public event CoinChangeCallback OnCoinChange;
+
 	Detector pitchDetector; 
 	public int pitchTimeInterval=100;
 	private int minFreq, maxFreq;
@@ -240,35 +244,46 @@ public class ShipSoundController : MonoBehaviour
 		switch(other.gameObject.tag) {
 		case "Coin":
 			Debug.Log ("it's a coin!");
-			SCORE++;
+			IncrementScore(1);
+
 			Destroy (other.gameObject);
 			break;
 		case "Slow":
 			Debug.Log ("speed drain/slow: .5x speed");
-			SCORE++;
+			IncrementScore(1);
 			speedMult *= 0.5f;
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, .5f));
 			break;
 		case "Boost":
 			Debug.Log ("speed boost: 2x speed");
-			SCORE++;
+			IncrementScore(1);
 			speedMult *= 2f;
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, 2f));
+
+
 			break;
 		case "Shot":
 			Debug.Log("canons loaded");
-			SCORE++;
+			IncrementScore(1);
 			// do thing here
 			Destroy (other.gameObject);
 			break;
 		case "Fever":
 			Debug.Log ("fever mode?");
-			SCORE++;
+			IncrementScore(1);
 			Destroy (other.gameObject);
 			break;
 		}
+	}
+
+	public void IncrementScore(int delta)
+	{
+		SCORE += delta;
+
+		if (OnCoinChange != null)
+			OnCoinChange(SCORE);
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {

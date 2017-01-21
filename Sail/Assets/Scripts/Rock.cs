@@ -18,6 +18,11 @@ public class Rock : MonoBehaviour {
 		if (collision.gameObject != null && collision.gameObject.tag == "Bullet")
 		{
 			Destroy(this.gameObject);
+
+			ShipSoundController ship = GameObject.FindObjectOfType<ShipSoundController>();
+			ship.IncrementScore(1);
+
+
 		}
 	}
 }
