@@ -22,6 +22,9 @@ public class ShipSoundController : MonoBehaviour
 	private int minFreq, maxFreq;
 	int lastNormalizedNote;
 	int lastMidiNote;
+	float lastLoudness;
+	float lastLoudnessDetectedTime;
+	float currTimestamp;
 
 	Quaternion cachedTargetRotation;
 
@@ -31,6 +34,9 @@ public class ShipSoundController : MonoBehaviour
 	float accumTime;
 	public float SPEED = 5.0f;
 
+	public float LOUDNESS_THRESHOLD = 0.01f;
+	public float LOUDNESS_DELTA_THRESHOLD = 0.01f;
+
 	private Collider collider;
 
 
@@ -39,6 +45,8 @@ public class ShipSoundController : MonoBehaviour
 		pitchDetector = new Detector();
 		pitchDetector.setSampleRate(AudioSettings.outputSampleRate);
 		lastNormalizedNote = 0;
+		lastLoudness = 0;
+		lastLoudnessDetectedTime = Time.realtimeSinceStartup;
 	}
 
 	void SetuptMic() {
@@ -72,8 +80,32 @@ public class ShipSoundController : MonoBehaviour
 		accumTime = 0;
 	}
 
+	static float CalculateLoudness(float[] data)
+	{
+		// loudness detection
+		float result = 0;
+		for(int i = 0; i < data.Length; ++i)
+		{
+			result += data[i];
+		}
+
+		result = result / data.Length;
+		return result;
+	}
+
 	void OnAudioFilterRead(float[] data, int channels)
 	{
+		float loudness = CalculateLoudness(data);
+		float deltaLoudness = Mathf.Abs(loudness - lastLoudness);
+
+		if (loudness > LOUDNESS_THRESHOLD && deltaLoudness > LOUDNESS_DELTA_THRESHOLD && currTimestamp > lastLoudnessDetectedTime + 1.0f)
+		{
+			Debug.Log("Hoh!!");
+			lastLoudnessDetectedTime = currTimestamp;
+		}
+
+		// Debug.Log(string.Format("Loudness: {0:0.0000}, delta: {1:0.0000}", loudness, deltaLoudness));
+
 		pitchDetector.DetectPitch(data);
 		int midiNote = pitchDetector.lastMidiNote();
 		string note = pitchDetector.lastNote();
@@ -124,7 +156,7 @@ public class ShipSoundController : MonoBehaviour
 			
 			// transform.rotation = rot;
 			// Debug.Log("Detected note: " + midiNote);	
-			Debug.Log("Detected freq: " + freq + " - Note:  " + midiNote);
+			// Debug.Log("Detected freq: " + freq + " - Note:  " + midiNote);
 		}
 		else
 		{
@@ -137,10 +169,13 @@ public class ShipSoundController : MonoBehaviour
 		}
 
 		lastMidiNote = midiNote;
+		lastLoudness = loudness;
 	}
 
 	void Update()
 	{
+		currTimestamp = Time.realtimeSinceStartup;
+
 		if (turningPolicy == TurningPolicy.DIRECT ||
 			turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
 		{
