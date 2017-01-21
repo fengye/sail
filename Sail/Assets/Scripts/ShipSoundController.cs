@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using PitchDetector;
 
 public class ShipSoundController : MonoBehaviour
@@ -11,7 +12,10 @@ public class ShipSoundController : MonoBehaviour
 
 	float accumTime;
 	public float DETECT_INTERVAL = 0.1f;
-	public float SPEED = 10.0f;
+	public float SPEED = 5.0f;
+
+	private Collider collider;
+
 
 	void Awake()
 	{
@@ -46,6 +50,8 @@ public class ShipSoundController : MonoBehaviour
 		waveData = new float[bufferLen];
 
 		SetuptMic();
+
+		collider = GetComponent<BoxCollider> ();
 
 		accumTime = 0;
 	}
@@ -82,5 +88,36 @@ public class ShipSoundController : MonoBehaviour
 			transform.up * SPEED * Time.deltaTime;
 
 		accumTime += Time.deltaTime;
+	}
+
+	void OnCollisionEnter(Collision coll) {
+		Debug.Log ("collision");
+		if (coll.gameObject.CompareTag ("Obstacle")) {
+			StartCoroutine (CollidedWithRock ());
+		}
+	}
+
+	IEnumerator CollidedWithRock() {
+		// may destroy the rock
+		GameObject child = transform.GetChild (0).gameObject;
+		collider.enabled = false;
+		SPEED = 1f;
+		for(int i = 1; i < 10; i++) {
+			Flash (child);
+			yield return new WaitForSeconds (0.2f);
+			if(SPEED < 5 && (i % 2) == 0) {
+				SPEED += 1;
+			}
+		}
+		child.SetActive (true);
+		collider.enabled = true;
+	}
+
+	void Flash(GameObject obj) {
+		if(obj.activeSelf) {
+			obj.SetActive (false);
+		} else {
+			obj.SetActive (true);
+		}
 	}
 }
