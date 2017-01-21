@@ -38,7 +38,6 @@ public class ShipSoundController : MonoBehaviour
 	public float LOUDNESS_THRESHOLD = 0.01f;
 	public float LOUDNESS_DELTA_THRESHOLD = 0.01f;
 
-	private Collider collider;
 	public Sprite[] sprites;
 
 	private SpriteRenderer sprite;

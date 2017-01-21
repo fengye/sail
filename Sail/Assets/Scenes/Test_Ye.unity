@@ -2907,8 +2907,10 @@ MonoBehaviour:
   turningPolicy: 0
   samplingPolicy: 1
   SPEED: 10
+  SCORE: 0
   LOUDNESS_THRESHOLD: 0.02
   LOUDNESS_DELTA_THRESHOLD: 0.01
+  sprites: []
 --- !u!82 &2058994483
 AudioSource:
   m_ObjectHideFlags: 0
