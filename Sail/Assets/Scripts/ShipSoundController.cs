@@ -43,6 +43,8 @@ public class ShipSoundController : MonoBehaviour
 	private SpriteRenderer sprite;
 	private Collider2D collider;
 
+	public Cannon cannon;
+
 	void Awake()
 	{
 		pitchDetector = new Detector();
@@ -81,6 +83,7 @@ public class ShipSoundController : MonoBehaviour
 		collider = GetComponent<BoxCollider2D> ();
 		sprite = GetComponentInChildren<SpriteRenderer> ();
 
+		cannon.EnableCannon(true);
 		accumTime = 0;
 	}
 
@@ -104,7 +107,7 @@ public class ShipSoundController : MonoBehaviour
 
 		if (loudness > LOUDNESS_THRESHOLD && deltaLoudness > LOUDNESS_DELTA_THRESHOLD && currTimestamp > lastLoudnessDetectedTime + 1.0f)
 		{
-			Debug.Log("Hoh!!");
+			cannon.Fire();
 			lastLoudnessDetectedTime = currTimestamp;
 		}
 
