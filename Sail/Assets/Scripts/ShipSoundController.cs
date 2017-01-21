@@ -34,11 +34,14 @@ public class ShipSoundController : MonoBehaviour
 	float accumTime;
 	public float SPEED = 10.0f;
 	public int SCORE = 0;
+	private float speedMult = 1;
+	private int life = 10;
 
 	public float LOUDNESS_THRESHOLD = 0.01f;
 	public float LOUDNESS_DELTA_THRESHOLD = 0.01f;
 
 	public Sprite[] sprites;
+	int currentSprite = 0;
 
 	private SpriteRenderer sprite;
 	private Collider2D collider;
@@ -224,20 +227,55 @@ public class ShipSoundController : MonoBehaviour
 
 
 		transform.position = transform.position + 
-			transform.up * SPEED * Time.deltaTime;
+			transform.up * SPEED * speedMult * Time.deltaTime;
 
 		accumTime += Time.deltaTime;
 	}
 
 	void OnTriggerEnter2D(Collider2D other) {
-		if(other.gameObject.CompareTag("Coin")) {
+		
+		switch(other.gameObject.tag) {
+		case "Coin":
+			Debug.Log ("it's a coin!");
 			SCORE++;
 			Destroy (other.gameObject);
+			break;
+		case "Slow":
+			Debug.Log ("speed drain/slow: .5x speed");
+			SCORE++;
+			speedMult *= 0.5f;
+			Destroy (other.gameObject);
+			StartCoroutine(ResetSpeedMult(10f, .5f));
+			break;
+		case "Boost":
+			Debug.Log ("speed boost: 2x speed");
+			SCORE++;
+			speedMult *= 2f;
+			Destroy (other.gameObject);
+			StartCoroutine(ResetSpeedMult(10f, 2f));
+			break;
+		case "Shot":
+			Debug.Log("canons loaded");
+			SCORE++;
+			// do thing here
+			Destroy (other.gameObject);
+			break;
+		case "Fever":
+			Debug.Log ("fever mode?");
+			SCORE++;
+			Destroy (other.gameObject);
+			break;
 		}
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
 		Debug.Log ("collision");
+		life--;
+		Debug.Log ("life: " + life);
+		if(life <= 5) {
+			currentSprite = 2;
+			sprite.sprite = sprites [currentSprite];
+		}
 		transform.position = Vector3.MoveTowards(transform.position, coll.contacts[0].normal, 2);
 		transform.Rotate (0, 0, Random.Range(-30, 30));
 		if (coll.gameObject.CompareTag ("Obstacle")) {
@@ -247,9 +285,15 @@ public class ShipSoundController : MonoBehaviour
 		}
 	}
 
+	IEnumerator ResetSpeedMult(float delay, float inc) {
+		yield return new WaitForSeconds (delay);
+		Debug.Log ("speed mult reset");
+		speedMult /= inc;
+	}
+
 	IEnumerator CollidedWithRock() {
 		GameObject child = transform.GetChild (0).gameObject;
-		sprite.sprite = sprites [1];
+		sprite.sprite = sprites [currentSprite+1];
 		collider.enabled = false;
 		SPEED = 1f;
 		for(int i = 1; i < 15; i++) {
@@ -259,7 +303,7 @@ public class ShipSoundController : MonoBehaviour
 				SPEED += 1;
 			}
 		}
-		sprite.sprite = sprites [0];
+		sprite.sprite = sprites [currentSprite];
 		child.SetActive (true);
 		collider.enabled = true;
 	}
