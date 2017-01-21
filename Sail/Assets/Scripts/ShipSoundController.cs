@@ -11,6 +11,12 @@ public class ShipSoundController : MonoBehaviour
 		DIFFERENTIAL,
 		DIFFERENTIAL_SILENT_TO_NEUTRAL
 	}
+
+	public enum SamplingPolicy
+	{
+		FREQUENCY_LINEAR,
+		OCTAVE_TURN_AROUND
+	}
 	Detector pitchDetector; 
 	public int pitchTimeInterval=100;
 	private int minFreq, maxFreq;
@@ -20,6 +26,7 @@ public class ShipSoundController : MonoBehaviour
 	Quaternion cachedTargetRotation;
 
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
+	public SamplingPolicy samplingPolicy = SamplingPolicy.OCTAVE_TURN_AROUND;
 
 	float accumTime;
 	public float SPEED = 5.0f;
@@ -74,13 +81,43 @@ public class ShipSoundController : MonoBehaviour
 
 		if (midiNote > 0)
 		{
-			int normalizedNote = midiNote - 50;
-			normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
+			int normalizedNote = 0;
+			float dirSegment = 22.5f;
+			if (samplingPolicy == SamplingPolicy.OCTAVE_TURN_AROUND)
+			{
+				int octave = midiNote / 12;
+				int noteNum = midiNote % 12;
+
+				
+				if (octave % 2 == 0)
+				{
+					normalizedNote = noteNum;
+				}
+				else
+				{
+					normalizedNote = (12 - 1) - noteNum;
+				}
+
+				// normalizedNote range == [0, 11]
+				// int normalizedNote = midiNote - 50;
+				// normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
+				normalizedNote -= 6;
+
+				dirSegment = 15.0f;
+			}
+			else
+			{
+				normalizedNote = midiNote - 50;
+				normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
+
+				dirSegment = 22.5f;
+			}
+			
 
 			if (turningPolicy == TurningPolicy.DIRECT ||
 				turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
 			{
-				cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * 22.5f);
+				cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * dirSegment);
 			}
 
 			lastNormalizedNote = normalizedNote;

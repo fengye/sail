@@ -30,4 +30,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-
+*.orig
