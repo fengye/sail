@@ -22,9 +22,9 @@ public class ShipSoundController : MonoBehaviour
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
 
 	float accumTime;
-	public float SPEED = 5.0f;
+	public float SPEED = 10.0f;
 
-	private Collider collider;
+	private Collider2D collider;
 
 
 	void Awake()
@@ -60,7 +60,7 @@ public class ShipSoundController : MonoBehaviour
 
 		SetuptMic();
 
-		collider = GetComponent<BoxCollider> ();
+		collider = GetComponent<BoxCollider2D> ();
 
 		accumTime = 0;
 	}
@@ -153,7 +153,7 @@ public class ShipSoundController : MonoBehaviour
 		accumTime += Time.deltaTime;
 	}
 
-	void OnCollisionEnter(Collision coll) {
+	void OnCollisionEnter2D(Collision2D coll) {
 		Debug.Log ("collision");
 		if (coll.gameObject.CompareTag ("Obstacle")) {
 			StartCoroutine (CollidedWithRock ());
@@ -168,7 +168,7 @@ public class ShipSoundController : MonoBehaviour
 		for(int i = 1; i < 10; i++) {
 			Flash (child);
 			yield return new WaitForSeconds (0.2f);
-			if(SPEED < 5 && (i % 2) == 0) {
+			if(SPEED < 10) { //&& (i % 2) == 0) {
 				SPEED += 1;
 			}
 		}
