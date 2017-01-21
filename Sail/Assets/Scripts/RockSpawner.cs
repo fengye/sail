@@ -18,7 +18,7 @@ public class RockSpawner : MonoBehaviour {
 	void Start() {
 		x = y = 50;
 		gridWidth = gridHeight = 40;
-		GenerateGrids ();
+//		GenerateGrids ();
 	}
 
 	void Update() {

@@ -23,9 +23,12 @@ public class ShipSoundController : MonoBehaviour
 
 	float accumTime;
 	public float SPEED = 10.0f;
+	public int SCORE = 0;
 
+	public Sprite[] sprites;
+
+	private SpriteRenderer sprite;
 	private Collider2D collider;
-
 
 	void Awake()
 	{
@@ -61,6 +64,7 @@ public class ShipSoundController : MonoBehaviour
 		SetuptMic();
 
 		collider = GetComponent<BoxCollider2D> ();
+		sprite = GetComponentInChildren<SpriteRenderer> ();
 
 		accumTime = 0;
 	}
@@ -153,25 +157,37 @@ public class ShipSoundController : MonoBehaviour
 		accumTime += Time.deltaTime;
 	}
 
+	void OnTriggerEnter2D(Collider2D other) {
+		if(other.gameObject.CompareTag("Coin")) {
+			SCORE++;
+			Destroy (other.gameObject);
+		}
+	}
+
 	void OnCollisionEnter2D(Collision2D coll) {
 		Debug.Log ("collision");
+		transform.position = Vector3.MoveTowards(transform.position, coll.contacts[0].normal, 2);
+		transform.Rotate (0, 0, Random.Range(-30, 30));
 		if (coll.gameObject.CompareTag ("Obstacle")) {
+			// may destroy the rock
+			Destroy(coll.gameObject);
 			StartCoroutine (CollidedWithRock ());
 		}
 	}
 
 	IEnumerator CollidedWithRock() {
-		// may destroy the rock
 		GameObject child = transform.GetChild (0).gameObject;
+		sprite.sprite = sprites [1];
 		collider.enabled = false;
 		SPEED = 1f;
-		for(int i = 1; i < 10; i++) {
+		for(int i = 1; i < 15; i++) {
 			Flash (child);
-			yield return new WaitForSeconds (0.2f);
+			yield return new WaitForSeconds (0.1f);
 			if(SPEED < 10) { //&& (i % 2) == 0) {
 				SPEED += 1;
 			}
 		}
+		sprite.sprite = sprites [0];
 		child.SetActive (true);
 		collider.enabled = true;
 	}
