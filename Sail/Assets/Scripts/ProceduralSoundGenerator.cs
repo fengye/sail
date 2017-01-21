@@ -19,7 +19,6 @@ public class ProceduralSoundGenerator : MonoBehaviour {
   private double currFreq;
 
   private float offsetVal;
-  private float accumTime;
 
   private int dataPhase;
 
@@ -29,7 +28,6 @@ public class ProceduralSoundGenerator : MonoBehaviour {
     currFreq = baseFrequency;
 
     offsetVal = initOffsetVal;
-    accumTime = 0;
     dataPhase = 0;
   }
 
@@ -74,14 +72,6 @@ public class ProceduralSoundGenerator : MonoBehaviour {
 
   void Update()
   {
-    // accumTime += Time.deltaTime;
-    // if (accumTime > 2.0f)
-    // {
-    //   offsetVal += 1;
-    //   SetNoteOffset(offsetVal);
-
-    //   accumTime = 0;
-    // }
 
     if (Input.GetKey(KeyCode.LeftArrow))
     {

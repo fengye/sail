@@ -14,13 +14,14 @@ public class ShipSoundController : MonoBehaviour
 	Detector pitchDetector; 
 	public int pitchTimeInterval=100;
 	private int minFreq, maxFreq;
-	// float[] waveData;
+	int lastNormalizedNote;
+	int lastMidiNote;
+
 	Quaternion cachedTargetRotation;
 
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
 
 	float accumTime;
-	public float DETECT_INTERVAL = 0.1f;
 	public float SPEED = 5.0f;
 
 	private Collider collider;
@@ -34,7 +35,6 @@ public class ShipSoundController : MonoBehaviour
 	}
 
 	void SetuptMic() {
-		//GetComponent<AudioSource>().volume = 0f;
 		GetComponent<AudioSource>().clip = null;
 		GetComponent<AudioSource>().loop = true; // Set the AudioClip to loop
 		GetComponent<AudioSource>().mute = false; // Mute the sound, we don't want the player to hear it
@@ -57,7 +57,6 @@ public class ShipSoundController : MonoBehaviour
 	{
 		int bufferLen = (int)Mathf.Round (AudioSettings.outputSampleRate * pitchTimeInterval / 1000f);
 		Debug.Log ("Buffer len: " + bufferLen);
-		// waveData = new float[bufferLen];
 
 		SetuptMic();
 
@@ -105,28 +104,6 @@ public class ShipSoundController : MonoBehaviour
 
 	void Update()
 	{
-		// if (accumTime > DETECT_INTERVAL )
-		// {
-
-		// 	GetComponent<AudioSource>().GetOutputData(waveData, 0);
-		// 	pitchDetector.DetectPitch(waveData);
-		// 	int midiNote = pitchDetector.lastMidiNote();
-		// 	string note = pitchDetector.lastNote();
-		// 	float freq = pitchDetector.lastFrequency();
-			
-
-		// 	if (midiNote > 0)
-		// 	{
-		// 		int normalizedNote = midiNote - 50;
-		// 		normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
-		// 		cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * 22.5f);
-		// 		// transform.rotation = rot;
-		// 		// Debug.Log("Detected note: " + midiNote);	
-		// 		Debug.Log("Detected freq: " + freq + " - Note:  " + midiNote);
-		// 	}
-		// 	accumTime -= DETECT_INTERVAL;
-		// }
-
 		if (turningPolicy == TurningPolicy.DIRECT ||
 			turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
 		{
