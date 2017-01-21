@@ -3,20 +3,33 @@ using PitchDetector;
 
 public class ShipSoundController : MonoBehaviour
 {
+	public enum TurningPolicy
+	{
+		DIRECT,
+		DIRECT_SILENCE_TO_NEUTRAL,
+		DIFFERENTIAL,
+		DIFFERENTIAL_SILENT_TO_NEUTRAL
+	}
 	Detector pitchDetector; 
 	public int pitchTimeInterval=100;
 	private int minFreq, maxFreq;
-	float[] waveData;
+	// float[] waveData;
 	Quaternion cachedTargetRotation;
 
+	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
+
 	float accumTime;
-	public float DETECT_INTERVAL = 0.1f;
+	// public float DETECT_INTERVAL = 0.1f;
 	public float SPEED = 10.0f;
+
+	int lastNormalizedNote;
+	int lastMidiNote;
 
 	void Awake()
 	{
 		pitchDetector = new Detector();
 		pitchDetector.setSampleRate(AudioSettings.outputSampleRate);
+		lastNormalizedNote = 0;
 	}
 
 	void SetuptMic() {
@@ -43,40 +56,116 @@ public class ShipSoundController : MonoBehaviour
 	{
 		int bufferLen = (int)Mathf.Round (AudioSettings.outputSampleRate * pitchTimeInterval / 1000f);
 		Debug.Log ("Buffer len: " + bufferLen);
-		waveData = new float[bufferLen];
+		// waveData = new float[bufferLen];
 
 		SetuptMic();
 
 		accumTime = 0;
 	}
 
-	void Update()
+	void OnAudioFilterRead(float[] data, int channels)
 	{
-		if (accumTime > DETECT_INTERVAL )
+		pitchDetector.DetectPitch(data);
+		int midiNote = pitchDetector.lastMidiNote();
+		string note = pitchDetector.lastNote();
+		float freq = pitchDetector.lastFrequency();
+
+		if (midiNote > 0)
 		{
+			int normalizedNote = midiNote - 50;
+			normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
 
-			GetComponent<AudioSource>().GetOutputData(waveData, 0);
-			pitchDetector.DetectPitch(waveData);
-			int midiNote = pitchDetector.lastMidiNote();
-			string note = pitchDetector.lastNote();
-			
-
-			if (midiNote > 0)
+			if (turningPolicy == TurningPolicy.DIRECT ||
+				turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
 			{
-				int normalizedNote = midiNote - 50;
-				normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
 				cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * 22.5f);
-				// transform.rotation = rot;
-
-				Debug.Log("Detected note: " + midiNote);	
 			}
 
+			lastNormalizedNote = normalizedNote;
+			
+			// transform.rotation = rot;
+			// Debug.Log("Detected note: " + midiNote);	
+			Debug.Log("Detected freq: " + freq + " - Note:  " + midiNote);
+		}
+		else
+		{
+			if (turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
+			{
+				cachedTargetRotation.eulerAngles = Vector3.zero;
+			}
 
-
-			accumTime -= DETECT_INTERVAL;
+			lastNormalizedNote = 0;
 		}
 
-		transform.rotation = Quaternion.Slerp(transform.rotation, cachedTargetRotation, 0.05f);
+		lastMidiNote = midiNote;
+	}
+
+	void Update()
+	{
+		// if (accumTime > DETECT_INTERVAL )
+		// {
+
+		// 	GetComponent<AudioSource>().GetOutputData(waveData, 0);
+		// 	pitchDetector.DetectPitch(waveData);
+		// 	int midiNote = pitchDetector.lastMidiNote();
+		// 	string note = pitchDetector.lastNote();
+		// 	float freq = pitchDetector.lastFrequency();
+			
+
+		// 	if (midiNote > 0)
+		// 	{
+		// 		int normalizedNote = midiNote - 50;
+		// 		normalizedNote = (int)Mathf.Clamp(normalizedNote, -4, 4);
+		// 		cachedTargetRotation.eulerAngles = new Vector3(0, 0, -normalizedNote * 22.5f);
+		// 		// transform.rotation = rot;
+		// 		// Debug.Log("Detected note: " + midiNote);	
+		// 		Debug.Log("Detected freq: " + freq + " - Note:  " + midiNote);
+		// 	}
+		// 	accumTime -= DETECT_INTERVAL;
+		// }
+
+		if (turningPolicy == TurningPolicy.DIRECT ||
+			turningPolicy == TurningPolicy.DIRECT_SILENCE_TO_NEUTRAL)
+		{
+			transform.rotation = Quaternion.Slerp(transform.rotation, cachedTargetRotation, 0.05f);
+		}
+		if (turningPolicy == TurningPolicy.DIFFERENTIAL)
+		{
+			Quaternion currRotation = transform.rotation;
+			transform.rotation = currRotation * Quaternion.AngleAxis(Time.deltaTime * -lastNormalizedNote * 22.5f, Vector3.forward);
+
+			Vector3 eulerAngles = transform.rotation.eulerAngles;
+			if (eulerAngles.z > 180)
+				eulerAngles.z -= 360;
+
+			eulerAngles.z = Mathf.Clamp(eulerAngles.z, -90.0f, 90.0f);
+
+			Quaternion rot = Quaternion.identity;
+			rot.eulerAngles = eulerAngles;
+			transform.rotation = rot;
+		}
+		if (turningPolicy == TurningPolicy.DIFFERENTIAL_SILENT_TO_NEUTRAL)
+		{
+			if (lastMidiNote == 0)
+			{
+				transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, 0.05f);
+			}
+			else
+			{
+				Quaternion currRotation = transform.rotation;
+				transform.rotation = currRotation * Quaternion.AngleAxis(Time.deltaTime * -lastNormalizedNote * 22.5f, Vector3.forward);
+
+				Vector3 eulerAngles = transform.rotation.eulerAngles;
+				if (eulerAngles.z > 180)
+					eulerAngles.z -= 360;
+
+				eulerAngles.z = Mathf.Clamp(eulerAngles.z, -90.0f, 90.0f);
+				Quaternion rot = Quaternion.identity;
+				rot.eulerAngles = eulerAngles;
+				transform.rotation = rot;
+			}
+		}
+
 
 		transform.position = transform.position + 
 			transform.up * SPEED * Time.deltaTime;
