@@ -52,6 +52,6 @@ public class BoxDropper : MonoBehaviour {
 		}
 
 		Debug.Log(str);
-		Utility.writeStringToFile("leveldata.txt", str);
+		// Utility.writeStringToFile("leveldata.txt", str);
 	}
 }

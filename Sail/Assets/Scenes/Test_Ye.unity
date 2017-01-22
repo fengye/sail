@@ -175,9 +175,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunks:
   - {fileID: 1000010120439064, guid: d4c211224ae243b4fb871a8556ceadb5, type: 2}
-  - {fileID: 1000013293781870, guid: 09ddd68f2733f4a4885bc2e556a51b5c, type: 2}
+  - {fileID: 1000012363785902, guid: e354587e8df2d0a4182f3d78e48d17fb, type: 2}
   - {fileID: 1000013268566670, guid: 051ff37624e902742ae7ef5367c29eea, type: 2}
   - {fileID: 1000010940149496, guid: f49c5a743f42993429ce19169fc9079e, type: 2}
+  - {fileID: 1000011748099928, guid: e68d39f94abbb6243ab7d209f936196d, type: 2}
+  - {fileID: 1000013989877634, guid: 67630f8a532dfeb4a8e8daf0f73e2bd0, type: 2}
   player: {fileID: 2058994480}
 --- !u!1 &36585647
 GameObject:
@@ -1013,7 +1015,7 @@ ParticleSystem:
   moveWithTransform: 0
   autoRandomSeed: 1
   scalingMode: 1
-  randomSeed: 840478325
+  randomSeed: 2049224556
   InitialModule:
     serializedVersion: 2
     enabled: 1
@@ -5537,7 +5539,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1610929030
 Transform:
   m_ObjectHideFlags: 0
@@ -6341,7 +6343,7 @@ MonoBehaviour:
   pitchTimeInterval: 100
   soundPlayerPrefab: {fileID: 4000013665060106, guid: 5eb38d3e465fa44ee9bc5742d9ddec93,
     type: 2}
-  hitSound: {fileID: 8300000, guid: baaf47edfed25412fab7c7770b87c179, type: 3}
+  hitSound: {fileID: 8300000, guid: 51b243cdfbc8a4368b934342f47b50b5, type: 3}
   turningPolicy: 0
   samplingPolicy: 1
   SPEED: 8
