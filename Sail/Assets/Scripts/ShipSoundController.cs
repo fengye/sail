@@ -37,6 +37,7 @@ public class ShipSoundController : MonoBehaviour
 
 	public Transform soundPlayerPrefab;
 	public AudioClip hitSound;
+	public AudioClip coinSound;
 
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
 	public SamplingPolicy samplingPolicy = SamplingPolicy.OCTAVE_TURN_AROUND;
@@ -264,6 +265,8 @@ public class ShipSoundController : MonoBehaviour
 
 			GameScoreManager.instance.Coin += 10;
 
+			PlayCoinSound();
+
 			Destroy (other.gameObject);
 			break;
 		case "Slow":
@@ -327,6 +330,14 @@ public class ShipSoundController : MonoBehaviour
 		GameObject obj = ((Transform)Instantiate(soundPlayerPrefab, transform.position, transform.rotation)).gameObject;
 		AudioSource audio = obj.GetComponent<AudioSource>();
 		audio.clip = hitSound;
+		audio.Play();
+	}
+
+	void PlayCoinSound()
+	{
+		GameObject obj = ((Transform)Instantiate(soundPlayerPrefab, transform.position, transform.rotation)).gameObject;
+		AudioSource audio = obj.GetComponent<AudioSource>();
+		audio.clip = coinSound;
 		audio.Play();
 	}
 

@@ -180,6 +180,7 @@ MonoBehaviour:
   - {fileID: 1000010940149496, guid: f49c5a743f42993429ce19169fc9079e, type: 2}
   - {fileID: 1000011748099928, guid: e68d39f94abbb6243ab7d209f936196d, type: 2}
   - {fileID: 1000013989877634, guid: 67630f8a532dfeb4a8e8daf0f73e2bd0, type: 2}
+  - {fileID: 1000012101467280, guid: 8af3682ff91899a41a8476e27b46ab76, type: 2}
   player: {fileID: 2058994480}
 --- !u!1 &36585647
 GameObject:
@@ -6344,6 +6345,7 @@ MonoBehaviour:
   soundPlayerPrefab: {fileID: 4000013665060106, guid: 5eb38d3e465fa44ee9bc5742d9ddec93,
     type: 2}
   hitSound: {fileID: 8300000, guid: 51b243cdfbc8a4368b934342f47b50b5, type: 3}
+  coinSound: {fileID: 8300000, guid: b799543c395a649c5a05053cc89b91ab, type: 3}
   turningPolicy: 0
   samplingPolicy: 1
   SPEED: 8

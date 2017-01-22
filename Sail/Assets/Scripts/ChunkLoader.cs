@@ -32,7 +32,7 @@ public class ChunkLoader : MonoBehaviour {
 
 	void LoadChunks() {
 		for(int i = (x + 1); i >= (x - 2); i--) {
-			for(int j = (y + 2); j >= y; j--) {
+			for(int j = (y + 3); j >= y + 1; j--) {
 
 				if (registry [i * 100 + j] > 0)
 					continue;

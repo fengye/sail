@@ -7,7 +7,7 @@ public class UITutorialScreen : MonoBehaviour
 {
 	void Update()
 	{
-		if (Input.GetKeyUp(KeyCode.Space))
+		if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Return))
 		{
 			SceneManager.LoadScene("Test_Ye");
 		}
