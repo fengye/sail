@@ -11,12 +11,12 @@ public class UIScoreText : MonoBehaviour
 		uiText = GetComponent<Text>();
 		uiText.text = "0";
 
-		GameScoreManager.instance.OnScoreUpdate += OnCoinChange;
+		GameScoreManager.instance.OnCoinUpdate += OnCoinChange;
 	}
 
 	void OnDestroy()
 	{
-		GameScoreManager.instance.OnScoreUpdate -= OnCoinChange;
+		GameScoreManager.instance.OnCoinUpdate -= OnCoinChange;
 	}
 
 	void OnCoinChange(int coin)

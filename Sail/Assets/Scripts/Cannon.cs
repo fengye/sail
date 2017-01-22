@@ -30,7 +30,7 @@ public class Cannon : MonoBehaviour {
 		{
 			StartCoroutine(EmitParticle());
 			Instantiate(bulletObject, transform.position, transform.parent.rotation);
-			bulletRemains--;
+			// bulletRemains--; unlimited
 
 			permitToFire = false;
 		}

@@ -35,6 +35,9 @@ public class ShipSoundController : MonoBehaviour
 		}
 	}
 
+	public Transform soundPlayerPrefab;
+	public AudioClip hitSound;
+
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
 	public SamplingPolicy samplingPolicy = SamplingPolicy.OCTAVE_TURN_AROUND;
 
@@ -227,6 +230,8 @@ public class ShipSoundController : MonoBehaviour
 			}
 			else
 			{
+
+
 				Quaternion currRotation = transform.rotation;
 				transform.rotation = currRotation * Quaternion.AngleAxis(Time.deltaTime * -lastNormalizedNote * 22.5f, Vector3.forward);
 
@@ -255,13 +260,15 @@ public class ShipSoundController : MonoBehaviour
 		switch(other.gameObject.tag) {
 		case "Coin":
 			Debug.Log ("it's a coin!");
-			IncrementScore(1);
+			IncrementScore(10);
+
+			GameScoreManager.instance.Coin += 10;
 
 			Destroy (other.gameObject);
 			break;
 		case "Slow":
 			Debug.Log ("speed drain/slow: .5x speed");
-			IncrementScore(1);
+			IncrementScore(5);
 			speedMult *= 0.5f;
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, .5f));
@@ -270,7 +277,7 @@ public class ShipSoundController : MonoBehaviour
 			break;
 		case "Boost":
 			Debug.Log ("speed boost: 2x speed");
-			IncrementScore(1);
+			IncrementScore(5);
 			speedMult *= 2f;
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, 2f));
@@ -281,7 +288,6 @@ public class ShipSoundController : MonoBehaviour
 			break;
 		case "Shot":
 			Debug.Log("canons loaded");
-			IncrementScore(1);
 			// do thing here
 			Destroy (other.gameObject);
 
@@ -289,7 +295,7 @@ public class ShipSoundController : MonoBehaviour
 			break;
 		case "Fever":
 			Debug.Log ("fever mode?");
-			IncrementScore(1);
+			IncrementScore(100);
 			Destroy (other.gameObject);
 
 			GameScoreManager.instance.Powerup = PowerupMode.FEVER;
@@ -316,9 +322,20 @@ public class ShipSoundController : MonoBehaviour
 		}
 	}
 
+	void PlayWreckSound()
+	{
+		GameObject obj = ((Transform)Instantiate(soundPlayerPrefab, transform.position, transform.rotation)).gameObject;
+		AudioSource audio = obj.GetComponent<AudioSource>();
+		audio.clip = hitSound;
+		audio.Play();
+	}
+
 	void OnCollisionEnter2D(Collision2D coll) {
 		Debug.Log ("collision");
 		UpdateLife(-1);
+
+		
+
 		Debug.Log ("life: " + GameScoreManager.instance.Life);
 		// if(GameScoreManager.instance.Life <= 5) {
 		// 	currentSprite = 2;
@@ -327,6 +344,9 @@ public class ShipSoundController : MonoBehaviour
 		transform.position = Vector3.MoveTowards(transform.position, coll.contacts[0].normal, 2);
 		transform.Rotate (0, 0, Random.Range(-30, 30));
 		if (coll.gameObject.CompareTag ("Obstacle")) {
+
+			PlayWreckSound();
+
 			// may destroy the rock
 			Destroy(coll.gameObject);
 			StartCoroutine (CollidedWithRock ());

@@ -44,7 +44,7 @@ public class ChunkLoader : MonoBehaviour {
 				Quaternion rot = new Quaternion ();
 				rot.eulerAngles = new Vector3 (0, 0, Random.Range (0, 4) * 90);
 				Vector3 pos = new Vector3 (grid_x * gridSize, grid_y * gridSize);
-				Instantiate (chunks[cIndex], pos, rot);
+				Instantiate (chunks[cIndex], pos, Quaternion.identity);
 
 				registry [i * 100 + j] = 1;
 			}

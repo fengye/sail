@@ -19,7 +19,7 @@ public class Rock : MonoBehaviour {
 		{
 			Destroy(this.gameObject);
 
-			GameScoreManager.instance.Score += 1;
+			GameScoreManager.instance.Score += 10;
 		}
 	}
 }
