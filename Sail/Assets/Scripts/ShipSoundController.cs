@@ -18,9 +18,6 @@ public class ShipSoundController : MonoBehaviour
 		OCTAVE_TURN_AROUND
 	}
 
-	public delegate void CoinChangeCallback(int coin);
-	public event CoinChangeCallback OnCoinChange;
-
 	Detector pitchDetector; 
 	public int pitchTimeInterval=100;
 	private int minFreq, maxFreq;
@@ -31,15 +28,19 @@ public class ShipSoundController : MonoBehaviour
 	float currTimestamp;
 
 	Quaternion cachedTargetRotation;
+	public Quaternion CachedTargetRotation
+	{
+		get {
+			return cachedTargetRotation;
+		}
+	}
 
 	public TurningPolicy turningPolicy = TurningPolicy.DIRECT;
 	public SamplingPolicy samplingPolicy = SamplingPolicy.OCTAVE_TURN_AROUND;
 
 	float accumTime;
 	public float SPEED = 10.0f;
-	public int SCORE = 0;
 	private float speedMult = 1;
-	private int life = 10;
 
 	public float LOUDNESS_THRESHOLD = 0.01f;
 	public float LOUDNESS_DELTA_THRESHOLD = 0.01f;
@@ -92,6 +93,14 @@ public class ShipSoundController : MonoBehaviour
 
 		cannon.EnableCannon(true);
 		accumTime = 0;
+
+		GameScoreManager.instance.OnLifeUpdate += OnLifeUpdated;
+		GameScoreManager.instance.TravelDistance = transform.position.y;
+	}
+
+	void OnDestroy()
+	{
+		GameScoreManager.instance.OnLifeUpdate -= OnLifeUpdated;	
 	}
 
 	static float CalculateLoudness(float[] data)
@@ -122,8 +131,8 @@ public class ShipSoundController : MonoBehaviour
 
 		pitchDetector.DetectPitch(data);
 		int midiNote = pitchDetector.lastMidiNote();
-		string note = pitchDetector.lastNote();
-		float freq = pitchDetector.lastFrequency();
+		// string note = pitchDetector.lastNote();
+		// float freq = pitchDetector.lastFrequency();
 
 		if (midiNote > 0)
 		{
@@ -236,6 +245,8 @@ public class ShipSoundController : MonoBehaviour
 		transform.position = transform.position + 
 			transform.up * SPEED * speedMult * Time.deltaTime;
 
+		GameScoreManager.instance.TravelDistance = transform.position.y;
+
 		accumTime += Time.deltaTime;
 	}
 
@@ -254,6 +265,8 @@ public class ShipSoundController : MonoBehaviour
 			speedMult *= 0.5f;
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, .5f));
+
+			GameScoreManager.instance.Powerup = PowerupMode.SLOW;
 			break;
 		case "Boost":
 			Debug.Log ("speed boost: 2x speed");
@@ -262,6 +275,8 @@ public class ShipSoundController : MonoBehaviour
 			Destroy (other.gameObject);
 			StartCoroutine(ResetSpeedMult(10f, 2f));
 
+			GameScoreManager.instance.Powerup = PowerupMode.BOOST;
+
 
 			break;
 		case "Shot":
@@ -269,31 +284,46 @@ public class ShipSoundController : MonoBehaviour
 			IncrementScore(1);
 			// do thing here
 			Destroy (other.gameObject);
+
+			GameScoreManager.instance.Powerup = PowerupMode.CANNON;
 			break;
 		case "Fever":
 			Debug.Log ("fever mode?");
 			IncrementScore(1);
 			Destroy (other.gameObject);
+
+			GameScoreManager.instance.Powerup = PowerupMode.FEVER;
 			break;
 		}
 	}
 
-	public void IncrementScore(int delta)
+	void IncrementScore(int delta)
 	{
-		SCORE += delta;
+		GameScoreManager.instance.Score = GameScoreManager.instance.Score + delta;
+	}
 
-		if (OnCoinChange != null)
-			OnCoinChange(SCORE);
+	void UpdateLife(int delta)
+	{
+		GameScoreManager.instance.Life = GameScoreManager.instance.Life + delta;
+	}
+
+	void OnLifeUpdated(int life)
+	{
+		if (life < 5)
+		{
+			currentSprite = 2;
+			sprite.sprite = sprites [currentSprite];
+		}
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
 		Debug.Log ("collision");
-		life--;
-		Debug.Log ("life: " + life);
-		if(life <= 5) {
-			currentSprite = 2;
-			sprite.sprite = sprites [currentSprite];
-		}
+		UpdateLife(-1);
+		Debug.Log ("life: " + GameScoreManager.instance.Life);
+		// if(GameScoreManager.instance.Life <= 5) {
+		// 	currentSprite = 2;
+		// 	sprite.sprite = sprites [currentSprite];
+		// }
 		transform.position = Vector3.MoveTowards(transform.position, coll.contacts[0].normal, 2);
 		transform.Rotate (0, 0, Random.Range(-30, 30));
 		if (coll.gameObject.CompareTag ("Obstacle")) {
@@ -307,6 +337,8 @@ public class ShipSoundController : MonoBehaviour
 		yield return new WaitForSeconds (delay);
 		Debug.Log ("speed mult reset");
 		speedMult /= inc;
+
+		GameScoreManager.instance.Powerup = PowerupMode.NONE;
 	}
 
 	IEnumerator CollidedWithRock() {

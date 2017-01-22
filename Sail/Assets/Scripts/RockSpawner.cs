@@ -19,6 +19,16 @@ public class RockSpawner : MonoBehaviour {
 		x = y = 50;
 		gridWidth = gridHeight = 40;
 //		GenerateGrids ();
+
+		if (player == null)
+		{
+			Debug.LogError("Missing PLAYER!");
+		}
+
+		if (rockObject == null)
+		{
+			Debug.LogError("Missing ROCK!");
+		}
 	}
 
 	void Update() {

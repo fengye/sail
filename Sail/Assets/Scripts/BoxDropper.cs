@@ -30,7 +30,7 @@ public class BoxDropper : MonoBehaviour {
 			positionList.Add(transform.position);
 			rotationList.Add(transform.rotation);
 
-			Object obj = Instantiate(boxObject, this.transform.position, this.transform.rotation);
+			Instantiate(boxObject, this.transform.position, this.transform.rotation);
 
 		}
 	}

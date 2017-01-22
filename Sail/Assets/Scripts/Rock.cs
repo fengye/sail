@@ -19,10 +19,7 @@ public class Rock : MonoBehaviour {
 		{
 			Destroy(this.gameObject);
 
-			ShipSoundController ship = GameObject.FindObjectOfType<ShipSoundController>();
-			ship.IncrementScore(1);
-
-
+			GameScoreManager.instance.Score += 1;
 		}
 	}
 }

@@ -10,7 +10,7 @@ public class Cannon : MonoBehaviour {
 	int bulletRemains;
 
 	bool permitToFire;
-	ParticleSystem particleSystem;
+	ParticleSystem smokeParticleSystem;
 	// Use this for initialization
 	void Start () {
 	
@@ -18,7 +18,7 @@ public class Cannon : MonoBehaviour {
 		bulletRemains = 0;
 		permitToFire = false;
 
-		particleSystem = GetComponent<ParticleSystem>();
+		smokeParticleSystem = GetComponent<ParticleSystem>();
 	}
 	
 	// Update is called once per frame
@@ -38,9 +38,9 @@ public class Cannon : MonoBehaviour {
 
 	IEnumerator EmitParticle()
 	{
-		particleSystem.Play();
+		smokeParticleSystem.Play();
 		yield return new WaitForSeconds(0.15f);
-		particleSystem.Stop();
+		smokeParticleSystem.Stop();
 	}
 
 	public void EnableCannon(bool enable)

@@ -11,15 +11,12 @@ public class UIScoreText : MonoBehaviour
 		uiText = GetComponent<Text>();
 		uiText.text = "0";
 
-		ShipSoundController ship = GameObject.FindObjectOfType<ShipSoundController>();
-		ship.OnCoinChange += OnCoinChange;
+		GameScoreManager.instance.OnScoreUpdate += OnCoinChange;
 	}
 
 	void OnDestroy()
 	{
-		ShipSoundController ship = GameObject.FindObjectOfType<ShipSoundController>();
-		ship.OnCoinChange -=  OnCoinChange;
-
+		GameScoreManager.instance.OnScoreUpdate -= OnCoinChange;
 	}
 
 	void OnCoinChange(int coin)

@@ -3,6 +3,10 @@
 	[
 		{
 			"path": "Sail/Assets"
+		},
+		{
+			"follow_symlinks": true,
+			"path": "/Users/feng_ye/Projects/sail/Sail/Assets/Scripts/"
 		}
 	]
 }
